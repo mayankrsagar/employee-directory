@@ -8,12 +8,18 @@
 <body>
   <h1>Employee Directory</h1>
 
-  <!-- Add Employee Button -->
+  <!-- Controls: Add & Search -->
   <div class="controls">
     <button onclick="window.location.href='add_edit.html'">+ Add Employee</button>
-    <input type="text" id="search" placeholder="Search by name or email" oninput="applyFilters(employees)">
+    <input
+      type="text"
+      id="search"
+      placeholder="Search by name or email"
+      oninput="applyFilters()"
+    >
   </div>
 
+  <!-- Employee Table -->
   <table id="employee-table">
     <thead>
       <tr>
@@ -27,14 +33,15 @@
       </tr>
     </thead>
     <tbody>
-      <!-- Rows rendered by JS -->
+      <!-- Rows injected by JavaScript -->
     </tbody>
   </table>
 
   <!-- Pagination Controls -->
   <div class="pagination">
-    <label>Show:
-      <select id="pageSize" onchange="changePageSize(this.value)">
+    <label>
+      Show:
+      <select id="pageSize" onchange="changePageSize(parseInt(this.value))">
         <option value="10">10</option>
         <option value="25">25</option>
         <option value="50">50</option>

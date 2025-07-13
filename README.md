@@ -12,20 +12,6 @@ This project is a responsive and interactive Employee Directory web interface bu
 * Pagination-ready layout
 * Fully responsive (mobile/tablet/desktop)
 
-## 📁 Project Structure
-
-```
-employee-directory/
-├── templates/
-│   ├── index.ftl          # Freemarker template (list view)
-│   └── add_edit.ftl       # Freemarker template (add/edit form)
-├── output/
-│   └── index.html         # Rendered HTML output from Freemarker
-├── styles.css             # Custom styles
-├── app.js                 # JS logic (edit/delete/search)
-├── FreemarkerRender.java  # Java file to render Freemarker templates
-└── README.md              # Project guide
-```
 
 ## 🚀 Setup Instructions
 
@@ -60,7 +46,7 @@ You can deploy the site using:
 
 #### Vercel:
 
-1. Go to [https://vercel.com/](https://vercel.com/)
+1. Go to [https://vercel.com/](https://employee-directory-virid.vercel.app/)
 2. Import your repo and deploy (set framework as `Other`)
 
 ## 🧠 Notes

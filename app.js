@@ -1,11 +1,49 @@
-let employees = Array.from(document.querySelectorAll("tr[data-id]"))?.map(row => ({
-  id: row.dataset.id,
-  firstName: row.children[0].textContent,
-  lastName: row.children[1].textContent,
-  email: row.children[2].textContent,
-  department: row.children[3].textContent,
-  role: row.children[4].textContent
-})) || [];
+function getQueryParam(param) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(param);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const table = document.querySelector("#employee-table");
+  let employees = [];
+
+  if (table) {
+    // Initialize employees array from rendered HTML rows
+    employees = Array.from(table.querySelectorAll("tbody tr[data-id]")).map(row => ({
+      id: row.dataset.id,
+      firstName: row.children[0].textContent,
+      lastName: row.children[1].textContent,
+      email: row.children[2].textContent,
+      department: row.children[3].textContent,
+      role: row.children[4].textContent
+    }));
+
+    // Render initial table
+    renderTable(employees);
+
+    // Attach search/filter/sort event handlers
+    document.getElementById("search").addEventListener("input", () => applyFilters(employees));
+  }
+
+  const form = document.querySelector("#emp-form");
+  if (form) {
+    // Prefill form when editing
+    const id = getQueryParam("id");
+    if (id) {
+      const emp = employees.find(e => e.id === id);
+      if (emp) {
+        document.getElementById("employeeId").value = emp.id;
+        document.getElementById("firstName").value = emp.firstName;
+        document.getElementById("lastName").value = emp.lastName;
+        document.getElementById("email").value = emp.email;
+        document.getElementById("department").value = emp.department;
+        document.getElementById("role").value = emp.role;
+      }
+    }
+
+    form.addEventListener("submit", event => submitForm(event, employees));
+  }
+});
 
 function renderTable(data) {
   const tbody = document.querySelector("#employee-table tbody");
@@ -20,15 +58,15 @@ function renderTable(data) {
       <td>${emp.department}</td>
       <td>${emp.role}</td>
       <td>
-        <button onclick="editEmployee('${emp.id}')">Edit</button>
-        <button onclick="deleteEmployee('${emp.id}')">Delete</button>
+        <button onclick="onEdit('${emp.id}')">Edit</button>
+        <button onclick="onDelete('${emp.id}')">Delete</button>
       </td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-function applyFilters() {
+function applyFilters(employees) {
   const searchText = document.getElementById("search").value.toLowerCase();
   const filtered = employees.filter(emp =>
     (emp.firstName + " " + emp.lastName).toLowerCase().includes(searchText) ||
@@ -38,22 +76,40 @@ function applyFilters() {
 }
 
 function sortBy(field) {
+  const table = document.querySelector("#employee-table");
+  if (!table) return;
+  // Fetch current list from DOM
+  const employees = Array.from(table.querySelectorAll("tbody tr[data-id]")).map(row => ({
+    id: row.dataset.id,
+    firstName: row.children[0].textContent,
+    lastName: row.children[1].textContent,
+    email: row.children[2].textContent,
+    department: row.children[3].textContent,
+    role: row.children[4].textContent
+  }));
   employees.sort((a, b) => a[field].localeCompare(b[field]));
   renderTable(employees);
 }
 
-function deleteEmployee(id) {
+function onDelete(id) {
+  let employees = Array.from(document.querySelectorAll("tbody tr[data-id]")).map(row => ({
+    id: row.dataset.id,
+    firstName: row.children[0].textContent,
+    lastName: row.children[1].textContent,
+    email: row.children[2].textContent,
+    department: row.children[3].textContent,
+    role: row.children[4].textContent
+  }));
   employees = employees.filter(e => e.id !== id);
   renderTable(employees);
 }
 
-function editEmployee(id) {
-  const emp = employees.find(e => e.id === id);
-  if (!emp) return;
-  window.location.href = `add_edit.ftl?id=${id}`; // or handle inline logic if on same page
+function onEdit(id) {
+  // Navigate to add_edit page
+  window.location.href = `add_edit.html?id=${id}`;
 }
 
-function submitForm(event) {
+function submitForm(event, employees) {
   event.preventDefault();
   const id = document.getElementById("employeeId").value || `E${Date.now()}`;
   const employee = {
@@ -75,8 +131,5 @@ function submitForm(event) {
     employees.push(employee);
   }
   alert("Saved successfully!");
-  window.location.href = "index.ftl";
+  window.location.href = "index.html";
 }
-
-// Initial render
-if (typeof renderTable === "function") renderTable(employees);

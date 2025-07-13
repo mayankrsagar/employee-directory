@@ -1,36 +1,49 @@
+let employees = [];
+let filteredEmployees = [];
+let currentPage = 1;
+let pageSize = 10;
+
+// Utility to get URL query parameter
 function getQueryParam(param) {
   const params = new URLSearchParams(window.location.search);
   return params.get(param);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Load employees from table rows if on index page
   const table = document.querySelector("#employee-table");
-  let employees = [];
-
   if (table) {
-    // Initialize employees array from rendered HTML rows
     employees = Array.from(table.querySelectorAll("tbody tr[data-id]")).map(row => ({
       id: row.dataset.id,
-      firstName: row.children[0].textContent,
-      lastName: row.children[1].textContent,
-      email: row.children[2].textContent,
-      department: row.children[3].textContent,
-      role: row.children[4].textContent
+      firstName: row.children[1].textContent,
+      lastName: row.children[2].textContent,
+      email: row.children[3].textContent,
+      department: row.children[4].textContent,
+      role: row.children[5].textContent
     }));
+    filteredEmployees = [...employees];
+    renderPage();
 
-    // Render initial table
-    renderTable(employees);
+    // Search input
+    document.getElementById("search").addEventListener("input", () => {
+      applyFilters();
+    });
 
-    // Attach search/filter/sort event handlers
-    document.getElementById("search").addEventListener("input", () => applyFilters(employees));
+    // Page size selector
+    document.getElementById("pageSize").addEventListener("change", e => {
+      changePageSize(parseInt(e.target.value));
+    });
   }
 
+  // Form handling on add/edit page
   const form = document.querySelector("#emp-form");
   if (form) {
-    // Prefill form when editing
     const id = getQueryParam("id");
     if (id) {
-      const emp = employees.find(e => e.id === id);
+      // Prefill edit
+      const stored = localStorage.getItem("employees");
+      const all = stored ? JSON.parse(stored) : [];
+      const emp = all.find(e => e.id === id);
       if (emp) {
         document.getElementById("employeeId").value = emp.id;
         document.getElementById("firstName").value = emp.firstName;
@@ -40,10 +53,16 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("role").value = emp.role;
       }
     }
-
-    form.addEventListener("submit", event => submitForm(event, employees));
+    form.addEventListener("submit", e => submitForm(e));
   }
 });
+
+function renderPage() {
+  const start = (currentPage - 1) * pageSize;
+  const pageData = filteredEmployees.slice(start, start + pageSize);
+  renderTable(pageData);
+  updatePagination();
+}
 
 function renderTable(data) {
   const tbody = document.querySelector("#employee-table tbody");
@@ -52,6 +71,7 @@ function renderTable(data) {
     const tr = document.createElement("tr");
     tr.setAttribute("data-id", emp.id);
     tr.innerHTML = `
+      <td>${emp.id}</td>
       <td>${emp.firstName}</td>
       <td>${emp.lastName}</td>
       <td>${emp.email}</td>
@@ -66,51 +86,55 @@ function renderTable(data) {
   });
 }
 
-function applyFilters(employees) {
+function applyFilters() {
   const searchText = document.getElementById("search").value.toLowerCase();
-  const filtered = employees.filter(emp =>
-    (emp.firstName + " " + emp.lastName).toLowerCase().includes(searchText) ||
+  filteredEmployees = employees.filter(emp =>
+    `${emp.firstName} ${emp.lastName}`.toLowerCase().includes(searchText) ||
     emp.email.toLowerCase().includes(searchText)
   );
-  renderTable(filtered);
+  currentPage = 1;
+  renderPage();
 }
 
 function sortBy(field) {
-  const table = document.querySelector("#employee-table");
-  if (!table) return;
-  // Fetch current list from DOM
-  const employees = Array.from(table.querySelectorAll("tbody tr[data-id]")).map(row => ({
-    id: row.dataset.id,
-    firstName: row.children[0].textContent,
-    lastName: row.children[1].textContent,
-    email: row.children[2].textContent,
-    department: row.children[3].textContent,
-    role: row.children[4].textContent
-  }));
-  employees.sort((a, b) => a[field].localeCompare(b[field]));
-  renderTable(employees);
+  filteredEmployees.sort((a, b) => a[field].localeCompare(b[field]));
+  currentPage = 1;
+  renderPage();
+}
+
+function changePageSize(size) {
+  pageSize = size;
+  currentPage = 1;
+  renderPage();
+}
+
+function goToPage(page) {
+  const totalPages = Math.ceil(filteredEmployees.length / pageSize);
+  if (page < 1 || page > totalPages) return;
+  currentPage = page;
+  renderPage();
+}
+
+function updatePagination() {
+  const totalPages = Math.ceil(filteredEmployees.length / pageSize);
+  document.getElementById("pageInfo").textContent = `Page ${currentPage} of ${totalPages}`;
+  document.getElementById("prevBtn").disabled = currentPage === 1;
+  document.getElementById("nextBtn").disabled = currentPage === totalPages;
 }
 
 function onDelete(id) {
-  let employees = Array.from(document.querySelectorAll("tbody tr[data-id]")).map(row => ({
-    id: row.dataset.id,
-    firstName: row.children[0].textContent,
-    lastName: row.children[1].textContent,
-    email: row.children[2].textContent,
-    department: row.children[3].textContent,
-    role: row.children[4].textContent
-  }));
   employees = employees.filter(e => e.id !== id);
-  renderTable(employees);
+  applyFilters();
 }
 
 function onEdit(id) {
-  // Navigate to add_edit page
   window.location.href = `add_edit.html?id=${id}`;
 }
 
-function submitForm(event, employees) {
+function submitForm(event) {
   event.preventDefault();
+  let all = localStorage.getItem("employees");
+  all = all ? JSON.parse(all) : employees;
   const id = document.getElementById("employeeId").value || `E${Date.now()}`;
   const employee = {
     id,
@@ -124,12 +148,9 @@ function submitForm(event, employees) {
     alert("Invalid email format");
     return;
   }
-  const index = employees.findIndex(e => e.id === id);
-  if (index > -1) {
-    employees[index] = employee;
-  } else {
-    employees.push(employee);
-  }
-  alert("Saved successfully!");
+  const idx = all.findIndex(e => e.id === id);
+  if (idx > -1) all[idx] = employee;
+  else all.push(employee);
+  localStorage.setItem("employees", JSON.stringify(all));
   window.location.href = "index.html";
 }

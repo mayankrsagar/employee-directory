@@ -11,31 +11,55 @@ function getQueryParam(param) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-      // Load employees from localStorage or default mock data
-    const stored = localStorage.getItem("employees");
-    if (stored) {
-      employees = JSON.parse(stored);
-    } else {
-      // Default mock data
-      employees = [
-        { id: "E001", firstName: "Alice", lastName: "Smith", email: "alice@example.com", department: "HR", role: "Manager" },
-        { id: "E002", firstName: "Bob", lastName: "Brown", email: "bob@example.com", department: "IT", role: "Developer" }
-      ];
-      localStorage.setItem("employees", JSON.stringify(employees));
-    }
-    filteredEmployees = [...employees];
-    renderPage();
+  // Load employees from localStorage or default mock data
+  const stored = localStorage.getItem("employees");
+  if (stored) {
+    employees = JSON.parse(stored);
+  } else {
+    employees = [
+      { id: "E001", firstName: "Alice", lastName: "Smith", email: "alice@example.com", department: "HR", role: "Manager" },
+      { id: "E002", firstName: "Bob", lastName: "Brown", email: "bob@example.com", department: "IT", role: "Developer" }
+    ];
+    localStorage.setItem("employees", JSON.stringify(employees));
+  }
 
-    // Search input
-    document.getElementById("search").addEventListener("input", () => {
-      applyFilters();
-    });
+  filteredEmployees = [...employees];
+  renderPage();
 
-    // Page size selector
-    document.getElementById("pageSize").addEventListener("change", e => {
+  // Search input
+  const searchInput = document.getElementById("search");
+  if (searchInput) {
+    searchInput.addEventListener("input", applyFilters);
+  }
+
+  // Page size selector
+  const pageSizeSelector = document.getElementById("pageSize");
+  if (pageSizeSelector) {
+    pageSizeSelector.addEventListener("change", e => {
       changePageSize(parseInt(e.target.value));
     });
   }
+
+  // Form handling on add/edit page
+  const form = document.querySelector("#emp-form");
+  if (form) {
+    const id = getQueryParam("id");
+    if (id) {
+      const all = JSON.parse(localStorage.getItem("employees") || "[]");
+      const emp = all.find(e => e.id === id);
+      if (emp) {
+        document.getElementById("employeeId").value = emp.id;
+        document.getElementById("firstName").value = emp.firstName;
+        document.getElementById("lastName").value = emp.lastName;
+        document.getElementById("email").value = emp.email;
+        document.getElementById("department").value = emp.department;
+        document.getElementById("role").value = emp.role;
+      }
+    }
+
+    form.addEventListener("submit", submitForm);
+  }
+});
 
   // Form handling on add/edit page
   const form = document.querySelector("#emp-form");

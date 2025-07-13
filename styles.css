@@ -1,0 +1,75 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  margin: 0;
+  background-color: #f4f4f4;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="submit"],
+button {
+  padding: 10px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+#employee-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: white;
+}
+
+#employee-table th, #employee-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+#employee-table th {
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead {
+    display: none;
+  }
+
+  td {
+    position: relative;
+    padding-left: 50%;
+    border: none;
+    border-bottom: 1px solid #ccc;
+  }
+
+  td::before {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    white-space: nowrap;
+    font-weight: bold;
+  }
+}

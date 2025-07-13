@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Employee Directory</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Employee Directory</h1>
+
+  <input type="text" id="search" placeholder="Search by name or email" onkeyup="applyFilters()">
+
+  <table id="employee-table">
+    <thead>
+      <tr>
+        <th onclick="sortBy('firstName')">First Name</th>
+        <th>Last Name</th>
+        <th>Email</th>
+        <th onclick="sortBy('department')">Department</th>
+        <th>Role</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr data-id="E001">
+          <td>Alice</td>
+          <td>Smith</td>
+          <td>alice@example.com</td>
+          <td>HR</td>
+          <td>Manager</td>
+          <td>
+            <button onclick="editEmployee('E001')">Edit</button>
+            <button onclick="deleteEmployee('E001')">Delete</button>
+          </td>
+        </tr>
+        <tr data-id="E002">
+          <td>Bob</td>
+          <td>Brown</td>
+          <td>bob@example.com</td>
+          <td>IT</td>
+          <td>Developer</td>
+          <td>
+            <button onclick="editEmployee('E002')">Edit</button>
+            <button onclick="deleteEmployee('E002')">Delete</button>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <script src="app.js"></script>
+</body>
+</html>

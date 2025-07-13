@@ -1,3 +1,4 @@
+// Global state
 let employees = [];
 let filteredEmployees = [];
 let currentPage = 1;
@@ -10,17 +11,18 @@ function getQueryParam(param) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Load employees from table rows if on index page
-  const table = document.querySelector("#employee-table");
-  if (table) {
-    employees = Array.from(table.querySelectorAll("tbody tr[data-id]")).map(row => ({
-      id: row.dataset.id,
-      firstName: row.children[1].textContent,
-      lastName: row.children[2].textContent,
-      email: row.children[3].textContent,
-      department: row.children[4].textContent,
-      role: row.children[5].textContent
-    }));
+      // Load employees from localStorage or default mock data
+    const stored = localStorage.getItem("employees");
+    if (stored) {
+      employees = JSON.parse(stored);
+    } else {
+      // Default mock data
+      employees = [
+        { id: "E001", firstName: "Alice", lastName: "Smith", email: "alice@example.com", department: "HR", role: "Manager" },
+        { id: "E002", firstName: "Bob", lastName: "Brown", email: "bob@example.com", department: "IT", role: "Developer" }
+      ];
+      localStorage.setItem("employees", JSON.stringify(employees));
+    }
     filteredEmployees = [...employees];
     renderPage();
 

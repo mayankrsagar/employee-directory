@@ -19,6 +19,23 @@
     >
   </div>
 
+  <!-- Pagination Controls -->
+  <div class="pagination">
+    <label>
+      Show:
+      <select id="pageSize" onchange="changePageSize(parseInt(this.value))">
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+      per page
+    </label>
+    <button onclick="goToPage(currentPage - 1)" id="prevBtn">Prev</button>
+    <span id="pageInfo">Page 1</span>
+    <button onclick="goToPage(currentPage + 1)" id="nextBtn">Next</button>
+  </div>
+
   <!-- Employee Table -->
   <table id="employee-table">
     <thead>
@@ -37,22 +54,7 @@
     </tbody>
   </table>
 
-  <!-- Pagination Controls -->
-  <div class="pagination">
-    <label>
-      Show:
-      <select id="pageSize" onchange="changePageSize(parseInt(this.value))">
-        <option value="10">10</option>
-        <option value="25">25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-      </select>
-      per page
-    </label>
-    <button onclick="goToPage(currentPage - 1)" id="prevBtn">Prev</button>
-    <span id="pageInfo">Page 1</span>
-    <button onclick="goToPage(currentPage + 1)" id="nextBtn">Next</button>
-  </div>
+  
 
   <script src="app.js"></script>
 </body>
